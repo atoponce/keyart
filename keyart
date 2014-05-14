@@ -28,9 +28,13 @@ except OSError:
     print "Please install GnuPG before using this script."
     sys.exit(4)
 
-key_size = [i.strip() for i in out[0].split(':')][2]
-key_algo = [i.strip() for i in out[0].split(':')][3]
-key_fpr = [i.strip() for i in out[0].split(':')][19]
+try:
+    key_size = [i.strip() for i in out[0].split(':')][2]
+    key_algo = [i.strip() for i in out[0].split(':')][3]
+    key_fpr = [i.strip() for i in out[0].split(':')][19]
+except IndexError:
+    print "It appears that {0} is not an exported public PGP key.".format(keyfile)
+    sys.exit(5)
 
 coin = ''
 f_bytes = []
