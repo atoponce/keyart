@@ -1,0 +1,5 @@
+BUGS
+----
+
+* Keys with a direct signature on the key will not display the ^fpr line.
+  See https://bugs.g10code.com/gnupg/issue1640.

@@ -18,10 +18,12 @@ elif not os.access(keyfile, os.R_OK):
     sys.exit(3)
 
 try:
+    DEVNULL = open(os.devnull, 'wb')
     gpg = subprocess.Popen(
         ('gpg','--with-fingerprint','--with-colons', keyfile),
-        stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE, stderr=DEVNULL)
     out = gpg.communicate()
+    DEVNULL.close()
 except OSError:
     print "Please install GnuPG before using this script."
     sys.exit(4)
