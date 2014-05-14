@@ -3,8 +3,8 @@ OpenPGP Random Art
 
 keyart takes a single exported public key file as an argument, and prints
 out its random visualization ASCII art based on the public key fingerprint.
-Please see 'docs/README' for more information about the algorithm and
-changes compared to OpenSSH keys.
+Please see 'doc/drunken-bishop.txt' for more information about the algorithm
+and changes compared to OpenSSH keys.
 
 Usage
 -----
