@@ -18,9 +18,14 @@ elif not os.access(keyfile, os.R_OK):
     sys.exit(3)
 
 try:
+    if os.access('/usr/bin/gpg',os.X_OK):
+        gpg_bin = '/usr/bin/gpg'
+    else:
+        gpg_bin = '/usr/bin/gpg2'
+
     DEVNULL = open(os.devnull, 'wb')
     gpg = subprocess.Popen(
-        ('gpg','--with-fingerprint','--with-colons', keyfile),
+        (gpg_bin,'--with-fingerprint','--with-colons', keyfile),
         stdout=subprocess.PIPE, stderr=DEVNULL)
     out = gpg.communicate()
     DEVNULL.close()
