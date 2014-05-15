@@ -55,6 +55,7 @@ def draw_art(keyfile):
         sys.exit(5)
 
     coin = ''
+    art = ''
     f_bytes = []
     pos = 104
     walk = [pos]
@@ -140,25 +141,25 @@ def draw_art(keyfile):
     else: key_algo = 'N/A'
 
     if len("["+key_algo+" "+key_size+"]") == 10:
-        print '+----[{0} {1}]-----+'.format(key_algo, key_size)
+        art += '+----[{0} {1}]-----+\n'.format(key_algo, key_size)
     elif len("["+key_algo+" "+key_size+"]") == 11:
-        print '+----[{0} {1}]----+'.format(key_algo, key_size)
+        art += '+----[{0} {1}]----+\n'.format(key_algo, key_size)
     elif len("["+key_algo+" "+key_size+"]") == 9:
-        print '+-----[{0} {1}]-----+'.format(key_algo, key_size)
+        art += '+-----[{0} {1}]-----+\n'.format(key_algo, key_size)
     elif len("["+key_algo+" "+key_size+"]") == 12:
-        print '+---[{0} {1}]----+'.format(key_algo, key_size)
+        art += '+---[{0} {1}]----+\n'.format(key_algo, key_size)
     elif len("["+key_algo+" "+key_size+"]") == 13:
-        print '+---[{0} {1}]---+'.format(key_algo, key_size)
+        art += '+---[{0} {1}]---+\n'.format(key_algo, key_size)
     elif len("["+key_algo+" "+key_size+"]") == 14:
-        print '+--[{0} {1}]---+'.format(key_algo, key_size)
+        art += '+--[{0} {1}]---+\n'.format(key_algo, key_size)
     elif len("["+key_algo+" "+key_size+"]") == 15:
-        print '+--[{0} {1}]--+'.format(key_algo, key_size)
+        art += '+--[{0} {1}]--+\n'.format(key_algo, key_size)
     elif len("["+key_algo+" "+key_size+"]") == 16:
-        print '+-[{0} {1}]--+'.format(key_algo, key_size)
+        art += '+-[{0} {1}]--+\n'.format(key_algo, key_size)
     elif len("["+key_algo+" "+key_size+"]") == 17:
-        print '+-[{0} {1}]-+'.format(key_algo, key_size)
+        art += '+-[{0} {1}]-+\n'.format(key_algo, key_size)
     else:
-        print '+-------------------+'
+        art += '+-------------------+\n'
 
     for i, v in enumerate(visits):
         coin += coins[v]
@@ -169,14 +170,16 @@ def draw_art(keyfile):
         if i == walk[len(walk)-1]:
             coin = "%sE" % coin[:len(coin)-1]
         if i % 19 == 18:
-            print "%s|" % coin
+            art += "%s|\n" % coin
             coin = ''
-    print '+----[{0}]-----+'.format(key_fpr[-8:])
 
-try:
-    for key in sys.argv[1:]:
-        draw_art(key)
-except IndexError:
-    print "Usage: keyart FILE [FILE [FILE ...]]"
-    sys.exit(1)
+    art += '+----[{0}]-----+'.format(key_fpr[-8:])
+    return art
 
+arts = []
+
+for key in sys.argv[1:]:
+    arts.append(draw_art(key))
+
+for art in arts:
+    print art
