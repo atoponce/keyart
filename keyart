@@ -210,5 +210,5 @@ arts = []
 for key in sys.argv[1:]:
     arts.append(draw_art(key))
 
-for art in arts:
+for i, art in enumerate(arts):
     print art
