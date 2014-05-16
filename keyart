@@ -93,6 +93,7 @@ def draw_art(keyfile):
                       '%s%s%s' % (o3,'M',reset), '%s%s%s' % (r1,'W',reset),
                       '%s%s%s' % (r2,'&',reset), '%s%s%s' % (r3,'8',reset),
                       '%s%s%s' % (p1,'%',reset), '%s%s%s' % (p2,'@',reset)]
+        markers = ['%s%s' % (reset,'S'), '%s%s' % (reset,'E')]
     else:
         coins = [' ','.','^',':','l','i','?','{','f','x','X','Z','#','M','W','&','8','%','@']
 
@@ -193,11 +194,10 @@ def draw_art(keyfile):
         coin += coins[v]
         if i % 19 == 0:
             coin = "|%s" % coin
-        ### BUG
         #if i == 104:
-            #coin = "%s%sS" % (coin[:10], reset)
+        #    coin = "%s%s" % (coin[:10], markers[0])
         #if i == walk[len(walk)-1]:
-            #coin = "%s%sE" % (coin[:len(coin)-1], reset)
+        #    coin = "%s%s" % (coin[:len(coin)-1], markers[1])
         if i % 19 == 18:
             art += "%s|\n" % coin
             coin = ''
@@ -205,10 +205,5 @@ def draw_art(keyfile):
     art += '+----[{0}]-----+'.format(key_fpr[-8:])
     return art
 
-arts = []
-
-for key in sys.argv[1:]:
-    arts.append(draw_art(key))
-
-for i, art in enumerate(arts):
-    print art
+key = sys.argv[1]
+print draw_art(key)
