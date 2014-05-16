@@ -5,6 +5,20 @@ import re   # needed only for work around
 import subprocess
 import sys
 
+def supports_color():
+    """
+    Returns True if the running system's terminal supports color, and False
+    otherwise.
+    """
+    plat = sys.platform
+    supported_platform = plat != 'Pocket PC' and (plat != 'win32' or
+                                                  'ANSICON' in os.environ)
+    # isatty is not always implemented, #6223.
+    is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
+    if not supported_platform or not is_a_tty:
+        return False
+    return True
+
 def draw_art(keyfile):
     if not os.path.isfile(keyfile):
         print "No such file or directory: {0}".format(keyfile)
@@ -60,20 +74,34 @@ def draw_art(keyfile):
     pos = 104
     walk = [pos]
     visits = [0]*209
-    coins = [' ','.','^',':','l','i','?','{','f','x','X','Z','#','M','W','&','8','%','@']
+    if supports_color():
+        # shades of blue, green, yellow, orange, red, pink
+        b1 = '\033[38;5;21m'; b2 = '\033[38;5;33m'; b3 = '\033[38;5;45m'; b4 = '\033[38;5;50m'
+        g1 = '\033[38;5;48m'; g2 = '\033[38;5;46m'; g3 = '\033[38;5;118m'
+        y1 = '\033[38;5;190m'; y2 = '\033[38;5;226m'; y3 = '\033[38;5;220m'
+        o1 = '\033[38;5;214m'; o2 = '\033[38;5;208m'; o3 = '\033[38;5;202m'
+        r1 = '\033[38;5;196m'; r2 = '\033[38;5;203m'; r3 = '\033[38;5;210m'
+        p1 = '\033[38;5;217m'; p2 = '\033[38;5;224m'
+        reset = '\033[0m'
+
+        coins = [' ', '%s%s%s' % (b1,'.',reset), '%s%s%s' % (b2,'^',reset),
+                      '%s%s%s' % (b3,':',reset), '%s%s%s' % (b4,'l',reset),
+                      '%s%s%s' % (g1,'i',reset), '%s%s%s' % (g2,'?',reset),
+                      '%s%s%s' % (g3,'{',reset), '%s%s%s' % (y1,'f',reset),
+                      '%s%s%s' % (y2,'x',reset), '%s%s%s' % (y3,'X',reset),
+                      '%s%s%s' % (o1,'Z',reset), '%s%s%s' % (o2,'#',reset),
+                      '%s%s%s' % (o3,'M',reset), '%s%s%s' % (r1,'W',reset),
+                      '%s%s%s' % (r2,'&',reset), '%s%s%s' % (r3,'8',reset),
+                      '%s%s%s' % (p1,'%',reset), '%s%s%s' % (p2,'@',reset)]
+    else:
+        coins = [' ','.','^',':','l','i','?','{','f','x','X','Z','#','M','W','&','8','%','@']
 
     zfill = str.zfill
 
     for c in key_fpr:
         f_bytes.append(zfill(bin(int(c,16))[2:],4)[:2]) # last 2 bits
         f_bytes.append(zfill(bin(int(c,16))[2:],4)[2:]) # first 2 bits
-            
-            
 
-    # I break from the OpenSSH implementation here. Rather than reading the
-    # bytes in little endian, the code is simpler reading in big endian. I
-    # don't see the point in complicating the code for little endian reading,
-    # when the fingerprint is SHA1 output, and should provide random output.
     for d in f_bytes:
         if (20 <= pos <=  36 or  39 <= pos <=  55 or  58 <= pos <=  74 or
             77 <= pos <=  93 or  96 <= pos <= 112 or 115 <= pos <= 131 or
@@ -165,10 +193,11 @@ def draw_art(keyfile):
         coin += coins[v]
         if i % 19 == 0:
             coin = "|%s" % coin
-        if i == 104:
-            coin = "%sS" % coin[:10]
-        if i == walk[len(walk)-1]:
-            coin = "%sE" % coin[:len(coin)-1]
+        ### BUG
+        #if i == 104:
+            #coin = "%s%sS" % (coin[:10], reset)
+        #if i == walk[len(walk)-1]:
+            #coin = "%s%sE" % (coin[:len(coin)-1], reset)
         if i % 19 == 18:
             art += "%s|\n" % coin
             coin = ''
