@@ -1,32 +1,18 @@
 #!/usr/bin/env python
 
+import argparse
 import os
 import re   # needed only for work around
 import subprocess
 import sys
 
-def supports_color():
-    """
-    Returns True if the running system's terminal supports color, and False
-    otherwise.
-    """
-    plat = sys.platform
-    supported_platform = plat != 'Pocket PC' and (plat != 'win32' or
-                                                  'ANSICON' in os.environ)
-    # isatty is not always implemented, #6223.
-    is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
-    if not supported_platform or not is_a_tty:
-        return False
-    return True
+parser = argparse.ArgumentParser(description='Create an ASCII art of a PGP key.')
+parser.add_argument('-a','--ansi', help='Print the art with ANSI color.',
+    action='store_true')
+parser.add_argument('file', type=argparse.FileType('r'))
+args = parser.parse_args()
 
 def draw_art(keyfile):
-    if not os.path.isfile(keyfile):
-        print "No such file or directory: {0}".format(keyfile)
-        sys.exit(2)
-    elif not os.access(keyfile, os.R_OK):
-        print "{0} is not readable. Check permissions.".format(keyfile)
-        sys.exit(3)
-
     try:
         if os.access('/usr/bin/gpg',os.X_OK):
             gpg_bin = '/usr/bin/gpg'
@@ -74,14 +60,25 @@ def draw_art(keyfile):
     pos = 104
     walk = [pos]
     visits = [0]*209
-    if supports_color():
-        # shades of blue, green, yellow, orange, red, pink
-        b1 = '\033[38;5;21m'; b2 = '\033[38;5;33m'; b3 = '\033[38;5;45m'; b4 = '\033[38;5;50m'
-        g1 = '\033[38;5;48m'; g2 = '\033[38;5;46m'; g3 = '\033[38;5;118m'
-        y1 = '\033[38;5;190m'; y2 = '\033[38;5;226m'; y3 = '\033[38;5;220m'
-        o1 = '\033[38;5;214m'; o2 = '\033[38;5;208m'; o3 = '\033[38;5;202m'
-        r1 = '\033[38;5;196m'; r2 = '\033[38;5;203m'; r3 = '\033[38;5;210m'
-        p1 = '\033[38;5;217m'; p2 = '\033[38;5;224m'
+    if args.ansi:
+        b1 = '\033[38;5;21m' # blue
+        b2 = '\033[38;5;33m'
+        b3 = '\033[38;5;45m'
+        b4 = '\033[38;5;50m'
+        g1 = '\033[38;5;48m'
+        g2 = '\033[38;5;46m' # green
+        g3 = '\033[38;5;118m'
+        y1 = '\033[38;5;190m'
+        y2 = '\033[38;5;226m' # yellow
+        y3 = '\033[38;5;220m'
+        o1 = '\033[38;5;214m' # orange
+        o2 = '\033[38;5;208m'
+        o3 = '\033[38;5;202m'
+        r1 = '\033[38;5;196m' # red
+        r2 = '\033[38;5;203m'
+        r3 = '\033[38;5;210m'
+        p1 = '\033[38;5;217m' # pink
+        p2 = '\033[38;5;224m'
         reset = '\033[0m'
 
         coins = [' ', '%s%s%s' % (b1,'.',reset), '%s%s%s' % (b2,'^',reset),
@@ -205,5 +202,5 @@ def draw_art(keyfile):
     art += '+----[{0}]-----+'.format(key_fpr[-8:])
     return art
 
-key = sys.argv[1]
+key = args.file.name
 print draw_art(key)
