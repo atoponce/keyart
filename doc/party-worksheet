@@ -1,0 +1,35 @@
+BASICS
+------
+To create a worksheet for a keysigning party, you will need to export each of
+the participants keys to their own file in a directory. If you've been storing
+them in a separate keyring, this should be easy.
+
+Once each key is in its own file, create a single "art.txt" file with all the
+keys. Something like:
+
+    $ for KEY in *.gpg; do keyart $KEY; done > art.txt
+
+In the examples/ directory of this documentation, is a 'party.sh' script that
+can transform that art.txt file to 5 key art per line. It will print the output
+to STDOUT. So, you could redirect to a file with:
+
+    $ ./party.sh > worksheet.txt
+
+Open 'worksheet.txt' in a text editor, and add newlines as necessary, so the
+key art is not broken by a page break. Use your text editor 'print preview' for
+help.
+
+Print off your modified 'worksheet.txt' for each key signing party attendee.
+
+COLOR WORKSHEET
+---------------
+If you would like to create an ANSI colored worksheet, you can install the
+Python "ansi2html" library, and redirect your output to an HTML file, which
+could then be used to print the worksheet:
+
+    $ sudo easy_install ansi2html
+    $ for KEY in *.gpg; do keyart -a $KEY; done > art.txt
+    $ ./party.sh | ansi2html > worksheet.html
+
+You may need to make some HTML adjustments to prevent the printer from breaking
+up the key art on the page break. Use your browser's 'print preview' for help.
