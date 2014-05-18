@@ -1,0 +1,30 @@
+.\" Manpage for keyart
+.\" Aaron Toponce <aaron.toponce@gmail.com>
+.TH man 1 "17 May 2014"
+.SH NAME
+.B keyart
+\- Create ASCII art of an OpenPGP key.
+.SH SYNOPSIS
+.B keyart [-a|--ansi] FILE
+.SH DESCRIPTION
+.B keyart
+creates an ASCII art representation of a supplied exported public
+OpenPGP key file. The art is an implementation of the Drunken Bishop by Dirk
+Loss. Documentation about the algorithm can be found /usr/share/doc/keyart/,
+or as appropriate for your distribution.
+
+.B keyart
+supports printing the ASCII art in both plain text (default) and ANSI
+color. ANSI color uses a "heat map", where cold (blue) represents squares in
+the room the drunk bishop has rarely visited, and hot (red) represents squares
+in the room the drunk bishop has frequently visited. There is a 1:1 ratio of
+color to printed character.
+.SH OPTIONS
+.TP 8
+.B -a | --ansi
+\- Print the ASCII art using ANSI color to the terminal.
+.SH SEE ALSO
+.BR gpg (1)
+.SH AUTHOR
+.B keyart
+and its documentation is written by Aaron Toponce <aaron.toponce@gmail.com>.
