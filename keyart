@@ -60,39 +60,6 @@ def draw_art(keyfile):
     pos = 104
     walk = [pos]
     visits = [0]*209
-    if args.ansi:
-        b1 = '\033[38;5;21m' # blue
-        b2 = '\033[38;5;33m'
-        b3 = '\033[38;5;45m'
-        b4 = '\033[38;5;50m'
-        g1 = '\033[38;5;48m'
-        g2 = '\033[38;5;46m' # green
-        g3 = '\033[38;5;118m'
-        y1 = '\033[38;5;190m'
-        y2 = '\033[38;5;226m' # yellow
-        y3 = '\033[38;5;220m'
-        o1 = '\033[38;5;214m' # orange
-        o2 = '\033[38;5;208m'
-        o3 = '\033[38;5;202m'
-        r1 = '\033[38;5;196m' # red
-        r2 = '\033[38;5;203m'
-        r3 = '\033[38;5;210m'
-        p1 = '\033[38;5;217m' # pink
-        p2 = '\033[38;5;224m'
-        reset = '\033[0m'
-
-        coins = [' ', '%s%s%s' % (b1,'.',reset), '%s%s%s' % (b2,'^',reset),
-                      '%s%s%s' % (b3,':',reset), '%s%s%s' % (b4,'l',reset),
-                      '%s%s%s' % (g1,'i',reset), '%s%s%s' % (g2,'?',reset),
-                      '%s%s%s' % (g3,'{',reset), '%s%s%s' % (y1,'f',reset),
-                      '%s%s%s' % (y2,'x',reset), '%s%s%s' % (y3,'X',reset),
-                      '%s%s%s' % (o1,'Z',reset), '%s%s%s' % (o2,'#',reset),
-                      '%s%s%s' % (o3,'M',reset), '%s%s%s' % (r1,'W',reset),
-                      '%s%s%s' % (r2,'&',reset), '%s%s%s' % (r3,'8',reset),
-                      '%s%s%s' % (p1,'%',reset), '%s%s%s' % (p2,'@',reset)]
-        markers = ['%s%s' % (reset,'S'), '%s%s' % (reset,'E')]
-    else:
-        coins = [' ','.','^',':','l','i','?','{','f','x','X','Z','#','M','W','&','8','%','@']
 
     zfill = str.zfill
 
@@ -188,19 +155,64 @@ def draw_art(keyfile):
         art += '+-------------------+\n'
 
     for i, v in enumerate(visits):
-        coin += coins[v]
+        # Build up the art with the boundaries and newlines
         if i % 19 == 0:
-            coin = "|%s" % coin
-        #if i == 104:
-        #    coin = "%s%s" % (coin[:10], markers[0])
-        #if i == walk[len(walk)-1]:
-        #    coin = "%s%s" % (coin[:len(coin)-1], markers[1])
-        if i % 19 == 18:
-            art += "%s|\n" % coin
-            coin = ''
+            art += "|{}"
+        elif i % 19 == 18:
+            art += "{}|\n"
+        else:
+            art += '{}'
+
+        # Insert the 'coin' into the art at this position
+        if i == 104: # Starting position
+            art = art.format(_get_coin(v, args.ansi, token='S'))
+        elif i == walk[len(walk)-1]: # Ending position
+            art = art.format(_get_coin(v, args.ansi, token='E'))
+        else:
+            art = art.format(_get_coin(v, args.ansi))
 
     art += '+----[{0}]-----+'.format(key_fpr[-8:])
     return art
 
-key = args.file.name
-print draw_art(key)
+def _get_coin(num_of_hits, ansi_art=False, token=None):
+    '''
+    Returns the coin for this humber of hits. If ansi_art is enabled the coin
+    will be colorized with ansi codes. If token is not None, it will use that
+    token instead of the default (used for the 'S' and 'E', start end tokens)
+    '''
+    tokens = [' ','.','^',':','l','i','?','{','f','x','X','Z','#','M','W','&','8','%','@']
+    if ansi_art:
+        colors = [
+            '\033[38;5;21m', # blue
+            '\033[38;5;33m',
+            '\033[38;5;45m',
+            '\033[38;5;50m',
+            '\033[38;5;48m',
+            '\033[38;5;46m', # green
+            '\033[38;5;118m',
+            '\033[38;5;190m',
+            '\033[38;5;226m', # yellow
+            '\033[38;5;220m',
+            '\033[38;5;214m', # orange
+            '\033[38;5;208m',
+            '\033[38;5;202m',
+            '\033[38;5;196m', # red
+            '\033[38;5;203m',
+            '\033[38;5;210m',
+            '\033[38;5;217m', # pink
+            '\033[38;5;224m',
+        ]
+        reset = '\033[0m'
+    else:
+        colors = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                  '', '', '', ]
+        reset = ''
+
+    color = colors[num_of_hits]
+    if not token:
+        token = tokens[num_of_hits]
+    return '{}{}{}'.format(color, token, reset)
+
+if __name__ == '__main__':
+    key = args.file.name
+    print draw_art(key)
