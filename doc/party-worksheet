@@ -1,13 +1,13 @@
 BASICS
 ------
-To create a worksheet for a keysigning party, you will need to export each of
-the participants keys to their own file in a directory. If you've been storing
-them in a separate keyring, this should be easy.
+To create a worksheet for a keysigning party, you will need to import each of
+the participants keys to your GPG keyring. If you've been storing them in a
+separate keyring, this should be easy.
 
-Once each key is in its own file, create a single "art.txt" file with all the
+Once each key has been imported, create a single "art.txt" file with all the
 keys. Something like:
 
-    $ for KEY in *.gpg; do keyart $KEY; done > art.txt
+    $ for KEY in 8086060F F34D3BC5 C22D2FCF; do keyart $KEY; done > art.txt
 
 In the examples/ directory of this documentation, is a 'party.sh' script that
 can transform that art.txt file to 5 key art per line. It will print the output
@@ -28,7 +28,7 @@ Python "ansi2html" library, and redirect your output to an HTML file, which
 could then be used to print the worksheet:
 
     $ sudo easy_install ansi2html
-    $ for KEY in *.gpg; do keyart -a $KEY; done > art.txt
+    $ for KEY in 8086060F F34D3BC5 C22D2FCF; do keyart -a $KEY; done > art.txt
     $ ./party.sh | ansi2html > worksheet.html
 
 You may need to make some HTML adjustments to prevent the printer from breaking

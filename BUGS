@@ -1,5 +1,4 @@
 BUGS
 ----
 
-* Something is broke when trying to print the 'S' and 'E' characters when also
-  printing the rest of the line in ANSI.
+None at this time.

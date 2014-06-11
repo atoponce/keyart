@@ -1,22 +1,18 @@
 OpenPGP Random Art
 ------------------
 
-keyart takes a single exported public key file as an argument, and prints
-out its random visualization ASCII art based on the public key fingerprint.
-Please see 'doc/drunken-bishop.txt' for more information about the algorithm
-and changes compared to OpenSSH keys.
+keyart takes any argument that can uniquely identify a key (name, email
+address, short key ID, long key ID, fingerprint, etc), and prints out its
+random visualization ASCII art based on the public key fingerprint. Please see
+'doc/drunken-bishop.txt' for more information about the algorithm and changes
+compared to OpenSSH keys.
 
 Usage
 -----
 
-The exported public key file can be in binary or ASCII armor format. To
-export the desired key:
+The key must be in your keyring. To produce the random art for a key:
 
-    $ gpg --output /tmp/0x808606060F.pgp --export 0x8086060F
-
-Then to produce the random art for that key:
-
-    $ keyart /tmp/0x8086060F.pgp
+    $ keyart 0x8086060F
     +----[DSA 1024]-----+
     |l^  . ^^?^.        |
     |l. . .l:.?         |
