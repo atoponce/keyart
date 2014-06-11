@@ -149,29 +149,29 @@ def draw_art(key):
 
         # Insert the 'coin' into the art at this position
         if i == 104: # Starting position
-            art = art.format(_get_coin(v, args.ansi, token='S'))
+            art = art.format(_get_coin(v, args.ansi, coin='S'))
         elif i == walk[len(walk)-1]: # Ending position
-            art = art.format(_get_coin(v, args.ansi, token='E'))
+            art = art.format(_get_coin(v, args.ansi, coin='E'))
         else:
             art = art.format(_get_coin(v, args.ansi))
 
     art += '+----[{0}]-----+'.format(key_fpr[-8:])
     return art
 
-def _get_coin(num_of_hits, ansi_art=False, token=None):
+def _get_coin(num_of_hits, ansi_art=False, coin=None):
     '''
     Returns the coin for this humber of hits. If ansi_art is enabled the coin
-    will be colorized with ansi codes. If token is not None, it will use that
-    token instead of the default (used for the 'S' and 'E', start end tokens)
+    will be colorized with ansi codes. If coin is not None, it will use that
+    coin instead of the default (used for the 'S' and 'E', start end coins)
     '''
-    tokens = [' ','.','^',':','l','i','?','(','f','x','X','Z','#','M','W','&','8','%','@']
+    coins = [' ','.','^',':','l','i','?','(','f','x','X','Z','#','M','W','&','8','%','@']
     colors = ['','','','','','','','','','','','','','','','','','']
     reset = ''
     if ansi_art:
         colors = [
-            '\033[38;5;21m', # blue
-            '\033[38;5;33m',
-            '\033[38;5;45m',
+            '', # no coin
+            '\033[38;5;21m', # blue (cold)
+            '\033[38;5;39m',
             '\033[38;5;50m',
             '\033[38;5;48m',
             '\033[38;5;46m', # green
@@ -186,14 +186,15 @@ def _get_coin(num_of_hits, ansi_art=False, token=None):
             '\033[38;5;203m',
             '\033[38;5;210m',
             '\033[38;5;217m', # pink
-            '\033[38;5;224m'
+            '\033[38;5;224m',
+            '\033[38;5;231m'  # white (hot)
         ]
         reset = '\033[0m'
 
     color = colors[num_of_hits]
-    if not token:
-        token = tokens[num_of_hits]
-    return '{}{}{}'.format(color, token, reset)
+    if not coin:
+        coin = coins[num_of_hits]
+    return '{}{}{}'.format(color, coin, reset)
 
 if __name__ == '__main__':
     key = args.keyid
