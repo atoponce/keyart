@@ -14,14 +14,14 @@ The key must be in your keyring. To produce the random art for a key:
 
     $ keyart 0x8086060F
     +----[DSA 1024]-----+
-    |l^  . ^^?^.        |
-    |l. . .l:.?         |
-    |^ E ...ll          |
-    |^. .  ^:.          |
-    |^ . .  ..          |
-    | . .   . S         |
-    |  . .   . .        |
-    |   .     .         |
+    |E  . . ^^i.        |
+    |:l. . i.^i:.       |
+    |^^.. :.^: :        |
+    |: ^   .l           |
+    |.. .  . :          |
+    |       . S         |
+    |                   |
+    |                   |
     |                   |
     |                   |
     |                   |
