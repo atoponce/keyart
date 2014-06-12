@@ -52,12 +52,11 @@ def draw_art(key):
             f_bytes.append(temp)
             temp = ''
 
-    for i,c in enumerate(f_bytes):
+    for i in range(len(f_bytes)):
         if i % 4 == 0:
             f_bytes[i],f_bytes[i+3] = f_bytes[i+3],f_bytes[i]
-        if i % 4 == 1:
-            f_bytes[i],f_bytes[i+1] = f_bytes[i+1],f_bytes[i]
-            i += 2
+            f_bytes[i+1],f_bytes[i+2] = f_bytes[i+2],f_bytes[i+1]
+            i += 4
 
     for d in f_bytes:
         if (20 <= pos <=  36 or  39 <= pos <=  55 or  58 <= pos <=  74 or
