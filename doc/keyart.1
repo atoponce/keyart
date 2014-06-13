@@ -5,7 +5,7 @@
 .B keyart
 \- Create ASCII art of an OpenPGP key.
 .SH SYNOPSIS
-.B keyart [-a|--ansi] FILE
+.B keyart [-a|--ansi] (-i|--id KEYID [KEYID ...] | -k|--keyring KEYRING [KEYRING ...])
 .SH DESCRIPTION
 .B keyart
 creates an ASCII art representation of a public OpenPGP key. The art is an
@@ -21,8 +21,19 @@ in the room the drunk bishop has frequently visited. There is a 1:1 ratio of
 color to printed character.
 .SH OPTIONS
 .TP 8
-.B -a | --ansi
-\- Print the ASCII art using ANSI color to the terminal.
+.B \-a \fR|\fI \-\-ansi
+Print the ASCII art using ANSI color to the terminal.
+.TP 8
+.B \-i \fR|\fI \-\-id KEYID [KEYID ...]
+A key identifier. Can be an email, fingerprint, keyid, name, etc. Either \-i or
+\-k are required.
+.TP 8
+.B \-k \fR|\fI \-\-keyring KEYRING [KEYRING ...]
+A pubic GPG keyring file. Code currently not implemented. Either \-i or \-k are
+required.
+.TP 8
+.B \-h \fR|\fI \-\-help
+Print the help message and quit.
 .SH SEE ALSO
 .BR gpg (1)
 .SH AUTHOR

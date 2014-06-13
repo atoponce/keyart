@@ -8,36 +8,25 @@ import sys
 
 parser = argparse.ArgumentParser(description='Create an ASCII art of a PGP key.')
 group = parser.add_mutually_exclusive_group(required=True)
-parser.add_argument('-a','--ansi', help='Print the art with ANSI color.', action='store_true')
-group.add_argument('-i', '--id', action='store_false', help='A key identifier.')
-#group.add_argument('-k', '--keyring', action='store_true', help='A GPG keyring.')
-parser.add_argument('KEYID', nargs='+')
+parser.add_argument('-a','--ansi', help='Print the art with ANSI color.')
+group.add_argument('-i', '--id', type=str, nargs='+', metavar=('KEID'),
+    help='A key identifier.')
+group.add_argument('-k', '--keyring', type=str, nargs='+', metavar=('KEYRING'),
+    help='A GPG keyring.')
 args = parser.parse_args()
 
-def draw_art(key):
+def test_env():
     try:
         if os.access('/usr/bin/gpg',os.X_OK):
             gpg_bin = '/usr/bin/gpg'
         else:
             gpg_bin = '/usr/bin/gpg2'
-
-        DEVNULL = open(os.devnull, 'wb')
-        gpg = subprocess.Popen(('gpg', '--fingerprint', '--with-colons', key),stdout=subprocess.PIPE, stderr=DEVNULL)
-        out = gpg.communicate()
-        DEVNULL.close()
+        return gpg_bin
     except OSError:
         print "Please install GnuPG before using this script."
         sys.exit(4)
 
-    try:
-        key_size = out[0].split('\n')[1].split(':')[2]
-        key_algo = out[0].split('\n')[1].split(':')[3]
-        key_fpr =  out[0].split('\n')[2].split(':')[9]
-
-    except IndexError:
-        print "It appears that {0} is not an exported public PGP key.".format(key)
-        sys.exit(5)
-
+def draw_art(key_size, key_algo, key_fpr):
     art = ''
     f_bytes = []
     pos = 104
@@ -52,11 +41,10 @@ def draw_art(key):
             f_bytes.append(temp)
             temp = ''
 
-    for i in range(len(f_bytes)):
-        if i % 4 == 0:
-            f_bytes[i],f_bytes[i+3] = f_bytes[i+3],f_bytes[i]
-            f_bytes[i+1],f_bytes[i+2] = f_bytes[i+2],f_bytes[i+1]
-            i += 4
+    # create a little-endian bit-pair array
+    for i in xrange(0, len(f_bytes), 4):
+        f_bytes[i],f_bytes[i+3] = f_bytes[i+3],f_bytes[i]
+        f_bytes[i+1],f_bytes[i+2] = f_bytes[i+2],f_bytes[i+1]
 
     for d in f_bytes:
         if (20 <= pos <=  36 or  39 <= pos <=  55 or  58 <= pos <=  74 or
@@ -204,6 +192,26 @@ def _get_coin(num_of_hits, ansi_art=False, coin=None):
     return '{}{}{}'.format(color, coin, reset)
 
 if __name__ == '__main__':
-    if args.KEYID:
-        for key in args.KEYID:
-            print draw_art(key)
+    gpg_bin = test_env()
+    DEVNULL = open(os.devnull, 'wb')
+
+    if args.id:
+        for key in args.id:
+            gpg = subprocess.Popen((gpg_bin, '--fingerprint',
+                '--with-colons', key),stdout=subprocess.PIPE, stderr=DEVNULL)
+            out = gpg.communicate()
+
+            key_size = out[0].split('\n')[1].split(':')[2]
+            key_algo = out[0].split('\n')[1].split(':')[3]
+            key_fpr =  out[0].split('\n')[2].split(':')[9]
+
+            print draw_art(key_size, key_algo, key_fpr)
+
+    if args.keyring:
+        print "This code isn't ready."
+        #for keyring in args.keyring:
+        #    gpg = subprocess.Popen((gpg_bin, '--with-fingerprint',
+        #        '--with-colons', key),stdout=subprocess.PIPE, stderr=DEVNULL)
+        #    out = gpg.communicate()
+
+    DEVNULL.close()
