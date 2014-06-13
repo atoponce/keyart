@@ -8,7 +8,8 @@ import sys
 
 parser = argparse.ArgumentParser(description='Create an ASCII art of a PGP key.')
 group = parser.add_mutually_exclusive_group(required=True)
-parser.add_argument('-a','--ansi', help='Print the art with ANSI color.')
+parser.add_argument('-a','--ansi', help='Print the art with ANSI color.',
+    action='store_true')
 group.add_argument('-i', '--id', type=str, nargs='+', metavar=('KEID'),
     help='A key identifier.')
 group.add_argument('-k', '--keyring', type=str, nargs='+', metavar=('KEYRING'),
