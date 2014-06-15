@@ -1,33 +1,37 @@
 #!/usr/bin/env python
+"""This script takes a key ID, fingerprint, email address, pubicly exported
+string, or a keyring, and prints the random ASCII art visualization of the key
+as per the Drunken Bishop algorithm as applied to OpenSSH keys by Dirk Loss."""
 
 import argparse
 import os
-import re   # needed only for work around
 import subprocess
 import sys
 
-parser = argparse.ArgumentParser(description='Create an ASCII art of a PGP key.')
-group = parser.add_mutually_exclusive_group(required=True)
-parser.add_argument('-a','--ansi', help='Print the art with ANSI color.',
-    action='store_true')
-group.add_argument('-i', '--id', type=str, nargs='+', metavar=('KEID'),
-    help='A key identifier.')
-group.add_argument('-k', '--keyring', type=str, nargs='+', metavar=('KEYRING'),
-    help='A GPG keyring.')
-args = parser.parse_args()
+PARSER = argparse.ArgumentParser(description='Create ASCII art of a PGP key.')
+GROUP = PARSER.add_mutually_exclusive_group(required=True)
+PARSER.add_argument('-a', '--ansi', help='Print the art with ANSI color.',
+                    action='store_true')
+GROUP.add_argument('-i', '--id', type=str, nargs='+', metavar=('KEID'),
+                   help='A key identifier.')
+GROUP.add_argument('-k', '--keyring', type=str, nargs='+', metavar=('KEYRING'),
+                   help='A GPG keyring.')
+ARGS = PARSER.parse_args()
 
 def test_env():
+    """Test if and where GPG is installed."""
     try:
-        if os.access('/usr/bin/gpg',os.X_OK):
-            gpg_bin = '/usr/bin/gpg'
+        if os.access('/usr/bin/gpg', os.X_OK):
+            gnupg = '/usr/bin/gpg'
         else:
-            gpg_bin = '/usr/bin/gpg2'
-        return gpg_bin
+            gnupg = '/usr/bin/gpg2'
+        return gnupg
     except OSError:
         print "Please install GnuPG before using this script."
         sys.exit(4)
 
 def draw_art(key_size, key_algo, key_fpr):
+    """Execute the Drunken Bishop algorithm on a key."""
     art = ''
     f_bytes = []
     pos = 104
@@ -36,66 +40,100 @@ def draw_art(key_size, key_algo, key_fpr):
     temp = ''
 
     key_bin = bin(int(key_fpr, 16))[2:].zfill(len(key_fpr)*4)
-    for i,c in enumerate(key_bin):
-        temp += c
+
+    for i, char in enumerate(key_bin):
+        temp += char
         if i % 2 == 1:
             f_bytes.append(temp)
             temp = ''
 
     # create a little-endian bit-pair array
     for i in xrange(0, len(f_bytes), 4):
-        f_bytes[i],f_bytes[i+3] = f_bytes[i+3],f_bytes[i]
-        f_bytes[i+1],f_bytes[i+2] = f_bytes[i+2],f_bytes[i+1]
+        f_bytes[i], f_bytes[i+3] = f_bytes[i+3], f_bytes[i]
+        f_bytes[i+1], f_bytes[i+2] = f_bytes[i+2], f_bytes[i+1]
 
-    for d in f_bytes:
-        if (20 <= pos <=  36 or  39 <= pos <=  55 or  58 <= pos <=  74 or
-            77 <= pos <=  93 or  96 <= pos <= 112 or 115 <= pos <= 131 or
-           134 <= pos <= 150 or 153 <= pos <= 169 or 172 <= pos <= 188):
-            if   d == '00': pos -= 20 # Square 'M'
-            elif d == '01': pos -= 18
-            elif d == '10': pos += 18
-            else: pos += 20
+    for pair in f_bytes:
+        if (20 <= pos <= 36 or 39 <= pos <= 55 or 58 <= pos <= 74 or
+                77 <= pos <= 93 or 96 <= pos <= 112 or 115 <= pos <= 131 or
+                134 <= pos <= 150 or 153 <= pos <= 169 or 172 <= pos <= 188):
+            if   pair == '00':
+                pos -= 20 # Square 'M'
+            elif pair == '01':
+                pos -= 18
+            elif pair == '10':
+                pos += 18
+            else:
+                pos += 20
         elif 1 <= pos <= 17: # Square 'T'
-            if   d == '00': pos -= 1
-            elif d == '01': pos += 1
-            elif d == '10': pos += 18
-            else: pos += 20
+            if pair == '00':
+                pos -= 1
+            elif pair == '01':
+                pos += 1
+            elif pair == '10':
+                pos += 18
+            else:
+                pos += 20
         elif 191 <= pos <= 207: # Square 'B'
-            if   d == '00': pos -= 20
-            elif d == '01': pos -= 18
-            elif d == '10': pos -= 1
-            else: pos += 1
+            if pair == '00':
+                pos -= 20
+            elif pair == '01':
+                pos -= 18
+            elif pair == '10':
+                pos -= 1
+            else:
+                pos += 1
         elif pos in [19, 38, 57, 76, 95, 114, 133, 152, 171]: # Square 'L'
-            if   d == '00': pos -= 19
-            elif d == '01': pos -= 18
-            elif d == '10': pos += 19
-            else: pos += 20
+            if pair == '00':
+                pos -= 19
+            elif pair == '01':
+                pos -= 18
+            elif pair == '10':
+                pos += 19
+            else:
+                pos += 20
         elif pos in [37, 56, 75, 94, 113, 132, 151, 170, 189]: # Square 'R'
-            if   d == '00': pos -= 20
-            elif d == '01': pos -= 19
-            elif d == '10': pos += 18
-            else: pos += 19
+            if pair == '00':
+                pos -= 20
+            elif pair == '01':
+                pos -= 19
+            elif pair == '10':
+                pos += 18
+            else:
+                pos += 19
         elif pos == 0: # Square 'a'
-            if   d == '01': pos += 1
-            elif d == '10': pos += 19
-            elif d == '11': pos += 20
+            if pair == '01':
+                pos += 1
+            elif pair == '10':
+                pos += 19
+            elif pair == '11':
+                pos += 20
         elif pos == 18: # Square 'b'
-            if   d == '00': pos -= 1
-            elif d == '10': pos += 18
-            elif d == '11': pos += 19
+            if pair == '00':
+                pos -= 1
+            elif pair == '10':
+                pos += 18
+            elif pair == '11':
+                pos += 19
         elif pos == 190: # Square 'c'
-            if   d == '00': pos -= 19
-            elif d == '01': pos -= 18
-            elif d == '11': pos += 1
+            if pair == '00':
+                pos -= 19
+            elif pair == '01':
+                pos -= 18
+            elif pair == '11':
+                pos += 1
         else: # Square 'd'
-            if   d == '00': pos -= 20
-            elif d == '01': pos -= 19
-            elif d == '10': pos -= 1
+            if pair == '00':
+                pos -= 20
+            elif pair == '01':
+                pos -= 19
+            elif pair == '10':
+                pos -= 1
         walk.append(pos)
 
-    for w in walk:
-        visits[w] += 1
-        if visits[w] > 18: visits[w] = 18
+    for square in walk:
+        visits[square] += 1
+        if visits[square] > 18:
+            visits[square] = 18
 
     # See https://tools.ietf.org/html/rfc4880#section-9.1
     # Also https://tools.ietf.org/html/rfc6637#section4
@@ -111,7 +149,8 @@ def draw_art(key_size, key_algo, key_fpr):
         key_algo = 'ECDSA'
     elif key_algo == '21':
         key_algo = 'X9.42'
-    else: key_algo = 'N/A'
+    else:
+        key_algo = 'N/A'
 
     if len("["+key_algo+" "+key_size+"]") == 10:
         art += '+----[{0} {1}]-----+\n'.format(key_algo, key_size)
@@ -134,7 +173,7 @@ def draw_art(key_size, key_algo, key_fpr):
     else:
         art += '+-------------------+\n'
 
-    for i, v in enumerate(visits):
+    for i, visit in enumerate(visits):
         # Build up the art with the boundaries and newlines
         if i % 19 == 0:
             art += "|{}"
@@ -145,23 +184,23 @@ def draw_art(key_size, key_algo, key_fpr):
 
         # Insert the 'coin' into the art at this position
         if i == 104: # Starting position
-            art = art.format(_get_coin(v, args.ansi, coin='S'))
+            art = art.format(_get_coin(visit, ARGS.ansi, coin='S'))
         elif i == walk[len(walk)-1]: # Ending position
-            art = art.format(_get_coin(v, args.ansi, coin='E'))
+            art = art.format(_get_coin(visit, ARGS.ansi, coin='E'))
         else:
-            art = art.format(_get_coin(v, args.ansi))
+            art = art.format(_get_coin(visit, ARGS.ansi))
 
     art += '+----[{0}]-----+'.format(key_fpr[-8:])
     return art
 
 def _get_coin(num_of_hits, ansi_art=False, coin=None):
-    '''
-    Returns the coin for this humber of hits. If ansi_art is enabled the coin
+    """Returns the coin for this humber of hits. If ansi_art is enabled the coin
     will be colorized with ansi codes. If coin is not None, it will use that
-    coin instead of the default (used for the 'S' and 'E', start end coins)
-    '''
-    coins = [' ','.','^',':','l','i','?','(','f','x','X','Z','#','M','W','&','8','%','@']
-    colors = ['','','','','','','','','','','','','','','','','','']
+    coin instead of the default (used for the 'S' and 'E', start end coins)."""
+    coins = [' ', '.', '^', ':', 'l', 'i', '?', '(', 'f', 'x', 'X', 'Z', '#',
+             'M', 'W', '&', '8', '%', '@']
+    colors = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+              '', '']
     reset = ''
     if ansi_art:
         colors = [
@@ -193,25 +232,26 @@ def _get_coin(num_of_hits, ansi_art=False, coin=None):
     return '{}{}{}'.format(color, coin, reset)
 
 if __name__ == '__main__':
-    gpg_bin = test_env()
+    GPG_BIN = test_env()
     DEVNULL = open(os.devnull, 'wb')
 
-    if args.id:
-        for key in args.id:
-            gpg = subprocess.Popen((gpg_bin, '--fingerprint',
-                '--with-colons', key),stdout=subprocess.PIPE, stderr=DEVNULL)
+    if ARGS.id:
+        for key in ARGS.id:
+            gpg = subprocess.Popen((GPG_BIN, '--fingerprint', '--with-colons',
+                                    key), stdout=subprocess.PIPE, stderr=DEVNULL
+                                  )
             out = gpg.communicate()
 
-            key_size = out[0].split('\n')[1].split(':')[2]
-            key_algo = out[0].split('\n')[1].split(':')[3]
-            key_fpr =  out[0].split('\n')[2].split(':')[9]
+            size = out[0].split('\n')[1].split(':')[2]
+            algo = out[0].split('\n')[1].split(':')[3]
+            fpr = out[0].split('\n')[2].split(':')[9]
 
-            print draw_art(key_size, key_algo, key_fpr)
+            print draw_art(size, algo, fpr)
 
-    if args.keyring:
+    if ARGS.keyring:
         print "This code isn't ready."
-        #for keyring in args.keyring:
-        #    gpg = subprocess.Popen((gpg_bin, '--with-fingerprint',
+        #for keyring in ARGS.keyring:
+        #    gpg = subprocess.Popen((GPG_BIN, '--with-fingerprint',
         #        '--with-colons', key),stdout=subprocess.PIPE, stderr=DEVNULL)
         #    out = gpg.communicate()
 
