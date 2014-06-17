@@ -5,6 +5,7 @@ as per the Drunken Bishop algorithm as applied to OpenSSH keys by Dirk Loss."""
 
 import argparse
 import os
+import re
 import subprocess
 import sys
 
@@ -17,6 +18,26 @@ GROUP.add_argument('-i', '--id', type=str, nargs='+', metavar=('KEID'),
 GROUP.add_argument('-k', '--keyring', type=str, nargs='+', metavar=('KEYRING'),
                    help='A GPG keyring.')
 ARGS = PARSER.parse_args()
+
+def _fix_gpg(GPG_BIN, keyid, keyring):
+    """Temporary work around for GnuPG bug #1640.
+    See https://bugs.g10code.com/gnupg/issue1640."""
+    DEVNULL = open(os.devnull, 'wb')
+    gpg = subprocess.Popen((GPG_BIN, '--output', '0x%s.gpg' % keyid,
+        '--no-default-keyring', '--keyring=%s' % keyring, '--export', keyid),
+        stderr=DEVNULL)
+    out = gpg.communicate()
+    gpg = subprocess.Popen((GPG_BIN, '--import', '0x%s.gpg' % keyid),
+        stderr=DEVNULL)
+    out = gpg.communicate()
+    gpg = subprocess.Popen(
+        (GPG_BIN,'--fingerprint','--with-colons',keyid),
+        stdout=subprocess.PIPE)
+    out = gpg.communicate()
+    print out
+    DEVNULL.close()
+    key_fpr = [i.strip() for i in out[0].split(':')][28]
+    return key_fpr
 
 def test_env():
     """Test if and where GPG is installed."""
@@ -240,19 +261,31 @@ if __name__ == '__main__':
             gpg = subprocess.Popen((GPG_BIN, '--fingerprint', '--with-colons',
                                     key), stdout=subprocess.PIPE, stderr=DEVNULL
                                   )
-            out = gpg.communicate()
+            out = gpg.communicate()[0].split('\n')
 
-            size = out[0].split('\n')[1].split(':')[2]
-            algo = out[0].split('\n')[1].split(':')[3]
-            fpr = out[0].split('\n')[2].split(':')[9]
+            size = out[1].split(':')[2]
+            algo = out[1].split(':')[3]
+            fpr = out[2].split(':')[9]
 
             print draw_art(size, algo, fpr)
 
     if ARGS.keyring:
-        print "This code isn't ready."
-        #for keyring in ARGS.keyring:
-        #    gpg = subprocess.Popen((GPG_BIN, '--with-fingerprint',
-        #        '--with-colons', key),stdout=subprocess.PIPE, stderr=DEVNULL)
-        #    out = gpg.communicate()
+        pattern = re.compile('[A-Z0-9]{40}')
+        for keyring in ARGS.keyring:
+            gpg = subprocess.Popen((GPG_BIN, '--with-fingerprint',
+                '--with-colons', keyring),stdout=subprocess.PIPE, stderr=DEVNULL)
+            grep = subprocess.Popen(('grep', '-E', '^(pub|fpr)'),
+                stdin=gpg.stdout, stdout=subprocess.PIPE, stderr=DEVNULL)
+            out = grep.communicate()[0].split('\n')
+
+            for i in xrange(0, len(out), 2):
+                size = out[i].split(':')[2]
+                algo = out[i].split(':')[3]
+                fpr = out[i+1].split(':')[9]
+
+                if not pattern.match(fpr):
+                    fpr = _fix_gpg(GPG_BIN, out[i+4], keyring)
+
+                print draw_art(size, algo, fpr)
 
     DEVNULL.close()
