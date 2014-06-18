@@ -10,9 +10,13 @@ compared to OpenSSH keys.
 Usage
 -----
 
-The key must be in your keyring. To produce the random art for a key:
+keyart can take a publicly exported GPG key or keyring to draw the art, or it
+can use an identifier to uniquely identify a key in your public keyring, such as
+an email address, short key ID, long key ID or key fingerprint.
 
-    $ keyart 0x8086060F
+To produce the random art for a key:
+
+    $ keyart -i 0x8086060F
     +----[DSA 1024]-----+
     |E  . . ^^i.        |
     |:l. . i.^i:.       |
