@@ -19,25 +19,26 @@ GROUP.add_argument('-k', '--keyring', type=str, nargs='+', metavar=('KEYRING'),
                    help='A GPG keyring.')
 ARGS = PARSER.parse_args()
 
-def _fix_gpg(GPG_BIN, keyid, keyring):
+def fix_gpg(gpg_bin, keyid, keyring):
     """Temporary work around for GnuPG bug #1640.
     See https://bugs.g10code.com/gnupg/issue1640."""
-    DEVNULL = open(os.devnull, 'wb')
-    gpg = subprocess.Popen((GPG_BIN, '--output', '0x%s.gpg' % keyid,
-        '--no-default-keyring', '--keyring=%s' % keyring, '--export', keyid),
-        stderr=DEVNULL)
-    out = gpg.communicate()
-    gpg = subprocess.Popen((GPG_BIN, '--import', '0x%s.gpg' % keyid),
-        stderr=DEVNULL)
-    out = gpg.communicate()
-    gpg = subprocess.Popen(
-        (GPG_BIN,'--fingerprint','--with-colons',keyid),
-        stdout=subprocess.PIPE)
-    out = gpg.communicate()
-    print out
-    DEVNULL.close()
-    key_fpr = [i.strip() for i in out[0].split(':')][28]
-    return key_fpr
+    cmd = (gpg_bin, '--yes', '--output', '0x%s.gpg' % keyid,
+           '--no-default-keyring', '--keyring=%s' % keyring, '--export', keyid)
+    gpg = subprocess.Popen(cmd)
+    gpg.communicate()
+
+    cmd = (gpg_bin, '--quiet', '--import', '0x%s.gpg' % keyid)
+    gpg = subprocess.Popen(cmd)
+    gpg.communicate()
+
+    cmd = (gpg_bin, '--fingerprint', '--with-colons', keyid)
+    gpg = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    cmd = ('grep', '^fpr')
+    grep = subprocess.Popen(cmd, stdin=gpg.stdout, stdout=subprocess.PIPE)
+    out = grep.communicate()[0]
+
+    fpr = out.split(':')[9]
+    return fpr
 
 def test_env():
     """Test if and where GPG is installed."""
@@ -253,14 +254,12 @@ def _get_coin(num_of_hits, ansi_art=False, coin=None):
     return '{}{}{}'.format(color, coin, reset)
 
 if __name__ == '__main__':
-    GPG_BIN = test_env()
-    DEVNULL = open(os.devnull, 'wb')
+    gpg_bin = test_env()
 
     if ARGS.id:
         for key in ARGS.id:
-            gpg = subprocess.Popen((GPG_BIN, '--fingerprint', '--with-colons',
-                                    key), stdout=subprocess.PIPE, stderr=DEVNULL
-                                  )
+            cmd = (gpg_bin, '--fingerprint', '--with-colons', key)
+            gpg = subprocess.Popen(cmd, stdout=subprocess.PIPE)
             out = gpg.communicate()[0].split('\n')
 
             size = out[1].split(':')[2]
@@ -270,22 +269,23 @@ if __name__ == '__main__':
             print draw_art(size, algo, fpr)
 
     if ARGS.keyring:
-        pattern = re.compile('[A-Z0-9]{40}')
+        pattern = re.compile('^([A-Z0-9]{32}|[A-Z0-9]{40})$')
         for keyring in ARGS.keyring:
-            gpg = subprocess.Popen((GPG_BIN, '--with-fingerprint',
-                '--with-colons', keyring),stdout=subprocess.PIPE, stderr=DEVNULL)
-            grep = subprocess.Popen(('grep', '-E', '^(pub|fpr)'),
-                stdin=gpg.stdout, stdout=subprocess.PIPE, stderr=DEVNULL)
+            cmd = (gpg_bin, '--with-fingerprint', '--with-colons', keyring)
+            gpg = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            cmd = ('grep', '-E', '^(pub|fpr)')
+            grep = subprocess.Popen(cmd, stdin=gpg.stdout,
+                                    stdout=subprocess.PIPE)
             out = grep.communicate()[0].split('\n')
 
-            for i in xrange(0, len(out), 2):
-                size = out[i].split(':')[2]
-                algo = out[i].split(':')[3]
-                fpr = out[i+1].split(':')[9]
+            for i in xrange(len(out)):
+                if out[i].split(':')[0] == 'pub':
+                    size = out[i].split(':')[2]
+                    algo = out[i].split(':')[3]
+                    fpr = out[i+1].split(':')[9]
 
-                if not pattern.match(fpr):
-                    fpr = _fix_gpg(GPG_BIN, out[i+4], keyring)
+                    if not pattern.match(fpr):
+                        keyid = out[i].split(':')[4]
+                        fpr = fix_gpg(gpg_bin, keyid, keyring)
 
-                print draw_art(size, algo, fpr)
-
-    DEVNULL.close()
+                    print draw_art(size, algo, fpr)
