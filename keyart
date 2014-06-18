@@ -244,13 +244,11 @@ if __name__ == '__main__':
 
     cmd = [gpg_bin, '--with-colons', '--fingerprint']
     if ARGS.fingerprint:
-        size = None
-        algo = None
-        fpr = ARGS.fingerprint[0]
-        if len(fpr) % 8 != 0:
-            print "Hex string must be a multiple of 8 bytes."
-            sys.exit(2)
-        print draw_art(size, algo, fpr)
+        for fpr in ARGS.fingerprint:
+            if len(fpr) % 8 != 0:
+                print "Hex string must be a multiple of 8 bytes."
+                sys.exit(2)
+            print draw_art(None, None, fpr)
 
     if ARGS.keyring:
         cmd.append('--no-default-keyring')
