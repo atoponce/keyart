@@ -46,6 +46,16 @@ of key files or keyrings; if this option is not present, the
 .TP 8
 .B \-h | \-\-help
 Print the help message and quit.
+.SH EXIT Codes
+.TP 8
+.B 0
+\fBkeyart\fR was executed sucessfully.
+.TP 8
+.B 1
+\fBgpg\fR(1) or \fBgpg2\fR(1) are not installed.
+.TP 8
+.B 2
+The supplied hexadecimal string is not a multiple of 8 bytes.
 .SH SEE ALSO
 .BR gpg (1)
 .SH AUTHOR
