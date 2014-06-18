@@ -10,7 +10,7 @@ import sys
 
 PARSER = argparse.ArgumentParser(
     description='Creates ASCII art from OpenPGP keys.')
-PARSER.add_argument('-a', '--ansi', help='Print the art with ANSI color.',
+PARSER.add_argument('-c', '--color', help='Print the art with ANSI color.',
                     action='store_true')
 PARSER.add_argument('-f', '--file', type=str, metavar=('FILE'),
                     action='append',
@@ -169,11 +169,11 @@ def draw_art(key_size, key_algo, key_fpr):
 
         # Insert the 'coin' into the art at this position
         if i == 104: # Starting position
-            art = art.format(_get_coin(visit, ARGS.ansi, coin='S'))
+            art = art.format(_get_coin(visit, ARGS.color, coin='S'))
         elif i == walk[len(walk)-1]: # Ending position
-            art = art.format(_get_coin(visit, ARGS.ansi, coin='E'))
+            art = art.format(_get_coin(visit, ARGS.color, coin='E'))
         else:
-            art = art.format(_get_coin(visit, ARGS.ansi))
+            art = art.format(_get_coin(visit, ARGS.color))
 
     art += '+{:-^19}+'.format("["+key_fpr[-8:]+"]")
     return art

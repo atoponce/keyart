@@ -6,7 +6,7 @@
 \- Create ASCII art of an OpenPGP key.
 .SH SYNOPSIS
 .B keyart
-[-a|--ansi] [-f|--file \fIFILE\fR] [\fIKEYID\fR ...]
+[-c|--color] [-f|--file \fIFILE\fR] [\fIKEYID\fR ...]
 .SH DESCRIPTION
 .B keyart
 creates an ASCII art representation of public OpenPGP keys. The art is an
@@ -25,7 +25,7 @@ The \fIKEYID\fRs are key identifiers (fingerprint, keyid, user ID, etc.
 see gpg(1) for details).  If no \fIKEYID\fR is given, \fBkeyart\fR
 creates an ASCII art representation for all keys found.
 .TP 8
-.B -a | --ansi
+.B -c | --color
 Print the ASCII art using ANSI color to the terminal.
 .TP 8
 .B -f | --file \fIFILE\fR
