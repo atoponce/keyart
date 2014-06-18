@@ -6,13 +6,13 @@
 \- Create ASCII art of an OpenPGP key.
 .SH SYNOPSIS
 .B keyart
-[-c|--color] [-f|--file \fIFILE\fR] [\fIKEYID\fR ...]
+[\-c|\-\-color] [\-f|\-\-file \fIFILE\fR] [\fIKEYID\fR ...]
 .SH DESCRIPTION
 .B keyart
 creates an ASCII art representation of public OpenPGP keys. The art is an
 implementation of the Drunken Bishop by Dirk Loss. Documentation about the
-algorithm can be found /usr/share/doc/keyart/, or as appropriate for your
-distribution.
+algorithm can be found in /usr/share/doc/signing-party/keyart/, or as
+appropriate for your distribution.
 
 .B keyart
 supports printing the ASCII art in both plain text (default) and ANSI
@@ -22,19 +22,21 @@ in the room the drunk bishop has frequently visited. There is a 1:1 ratio of
 color to printed character.
 
 The \fIKEYID\fRs are key identifiers (fingerprint, keyid, user ID, etc.
-see gpg(1) for details).  If no \fIKEYID\fR is given, \fBkeyart\fR
+see \fBgpg\fR(1) for details).  If no \fIKEYID\fR is given, \fBkeyart\fR
 creates an ASCII art representation for all keys found.
+
+.SH OPTIONS
 .TP 8
-.B -c | --color
+.B \-c | \-\-color
 Print the ASCII art using ANSI color to the terminal.
 .TP 8
-.B -f | --file \fIFILE\fR
+.B \-f | \-\-file \fIFILE\fR
 An OpenPGP key file or keyring, from which the \fIKEYID\fRs are
 exported.  This option can be repeated multiple times to provide a list
 of key files or keyrings; if this option is not present, the
 \fIKEYID\fRs are exported from GnuPG's default keyring.
 .TP 8
-.B -h | --help
+.B \-h | \-\-help
 Print the help message and quit.
 .SH SEE ALSO
 .BR gpg (1)
