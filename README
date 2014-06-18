@@ -16,7 +16,7 @@ an email address, short key ID, long key ID or key fingerprint.
 
 To produce the random art for a key:
 
-    $ keyart -i 0x8086060F
+    $ keyart 0x8086060F
     +----[DSA 1024]-----+
     |E  . . ^^i.        |
     |:l. . i.^i:.       |
