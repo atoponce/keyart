@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """This script takes a key ID, fingerprint, email address, pubicly exported
-string, or a keyring, and prints the random ASCII art visualization of the key
+key, or a keyring, and prints the random ASCII art visualization of the key
 as per the Drunken Bishop algorithm as applied to OpenSSH keys by Dirk Loss."""
 
 import argparse
