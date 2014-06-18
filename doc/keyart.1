@@ -6,7 +6,9 @@
 \- Create ASCII art of an OpenPGP key.
 .SH SYNOPSIS
 .B keyart
-[\-c|\-\-color] [\-f|\-\-file \fIFILE\fR [\-f|\-\-file \fIFILE\fR ...]]
+[\-c|\-\-color]
+[\-f|\-\-fingerprint \fIHEX\fR [\-f|\-\-fingerprint \fIHEX\fR ...]]
+[\-k|\-\-keyring \fIKEYRING\fR [\-k|\-\-keyring \fIKEYRING\fR ...]]
 [\fIKEYID\fR ...]
 .SH DESCRIPTION
 .B keyart
@@ -31,11 +33,16 @@ creates an ASCII art representation for all keys found.
 .B \-c | \-\-color
 Print the ASCII art using ANSI color to the terminal.
 .TP 8
-.B \-f | \-\-file \fIFILE\fR
+.B \-f | \-\-fingerprint \fIHEX\fR
+Any arbitrary hexadecimal string of any length. Could be an MD5, SHA1, SHA2, or
+SHA3 hexadecimal checksum. Useful for comparing and analyzing potential
+collisions with existing keys. This option can be repeated multiple times.
+.TP 8
+.B \-k | \-\-keyring \fIKEYRING\fR
 An OpenPGP key file or keyring, from which the \fIKEYID\fRs are
 exported.  This option can be repeated multiple times to provide a list
 of key files or keyrings; if this option is not present, the
-\fIKEYID\fRs are exported from GnuPG's default keyring.
+\fIKEYID\fRs are used from GnuPG's default keyring.
 .TP 8
 .B \-h | \-\-help
 Print the help message and quit.
