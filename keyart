@@ -8,13 +8,15 @@ import os
 import subprocess
 import sys
 
-PARSER = argparse.ArgumentParser(description='Creates ASCII art from OpenPGP keys.')
+PARSER = argparse.ArgumentParser(
+    description='Creates ASCII art from OpenPGP keys.')
 PARSER.add_argument('-a', '--ansi', help='Print the art with ANSI color.',
                     action='store_true')
-PARSER.add_argument('-f', '--file', type=str, metavar=('FILE'), action='append',
-                   help='A publicly exported OpenPGP key or keyring.')
+PARSER.add_argument('-f', '--file', type=str, metavar=('FILE'),
+                    action='append',
+                    help='A publicly exported OpenPGP key or keyring.')
 PARSER.add_argument('keyid', type=str, nargs='*', metavar=('KEYID'),
-                   help='A key identifier (email, ID, fingerprint, etc.).')
+                    help='A key identifier (email, ID, fingerprint, etc.).')
 ARGS = PARSER.parse_args()
 
 def test_env():
@@ -217,11 +219,11 @@ def _get_coin(num_of_hits, ansi_art=False, coin=None):
 if __name__ == '__main__':
     gpg_bin = test_env()
 
-    cmd = [ gpg_bin, '--with-colons', '--fingerprint' ]
+    cmd = [gpg_bin, '--with-colons', '--fingerprint']
     if ARGS.file:
         cmd.append('--no-default-keyring')
-        cmd.extend([ '--keyring=%s' % os.path.abspath(keyring) for keyring in
-                   ARGS.file ])
+        cmd.extend(['--keyring=%s' % os.path.abspath(keyring) for keyring in
+                    ARGS.file])
 
     if ARGS.keyid:
         cmd.append('--')
