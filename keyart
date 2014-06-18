@@ -186,7 +186,13 @@ def draw_art(key_size, key_algo, key_fpr):
         else:
             art = art.format(_get_coin(visit, ARGS.color))
 
-    art += '+{:-^19}+'.format("["+key_fpr[-8:]+"]")
+    if key_size:
+        footer = "["+key_fpr[-8:]+"]"
+    else:
+        footer = ''
+
+    art += '+{:-^19}+'.format(footer)
+
     return art
 
 def _get_coin(num_of_hits, ansi_art=False, coin=None):
