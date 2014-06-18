@@ -196,7 +196,7 @@ def _get_coin(num_of_hits, ansi_art=False, coin=None):
     coins = [' ', '.', '^', ':', 'l', 'i', '?', '(', 'f', 'x', 'X', 'Z', '#',
              'M', 'W', '&', '8', '%', '@']
     colors = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
-              '', '']
+              '', '', '']
     reset = ''
     if ansi_art:
         colors = [
