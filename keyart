@@ -151,26 +151,9 @@ def draw_art(key_size, key_algo, key_fpr):
     else:
         key_algo = 'N/A'
 
-    if len("["+key_algo+" "+key_size+"]") == 10:
-        art += '+----[{0} {1}]-----+\n'.format(key_algo, key_size)
-    elif len("["+key_algo+" "+key_size+"]") == 11:
-        art += '+----[{0} {1}]----+\n'.format(key_algo, key_size)
-    elif len("["+key_algo+" "+key_size+"]") == 9:
-        art += '+-----[{0} {1}]-----+\n'.format(key_algo, key_size)
-    elif len("["+key_algo+" "+key_size+"]") == 12:
-        art += '+---[{0} {1}]----+\n'.format(key_algo, key_size)
-    elif len("["+key_algo+" "+key_size+"]") == 13:
-        art += '+---[{0} {1}]---+\n'.format(key_algo, key_size)
-    elif len("["+key_algo+" "+key_size+"]") == 14:
-        art += '+--[{0} {1}]---+\n'.format(key_algo, key_size)
-    elif len("["+key_algo+" "+key_size+"]") == 15:
-        art += '+--[{0} {1}]--+\n'.format(key_algo, key_size)
-    elif len("["+key_algo+" "+key_size+"]") == 16:
-        art += '+-[{0} {1}]--+\n'.format(key_algo, key_size)
-    elif len("["+key_algo+" "+key_size+"]") == 17:
-        art += '+-[{0} {1}]-+\n'.format(key_algo, key_size)
-    else:
-        art += '+-------------------+\n'
+    header = "["+key_algo+" "+key_size+"]"
+    if len(header) > 19: x = ''
+    art += '+{:-^19}+\n'.format(header)
 
     for i, visit in enumerate(visits):
         # Build up the art with the boundaries and newlines
@@ -189,7 +172,7 @@ def draw_art(key_size, key_algo, key_fpr):
         else:
             art = art.format(_get_coin(visit, ARGS.ansi))
 
-    art += '+----[{0}]-----+'.format(key_fpr[-8:])
+    art += '+{:-^19}+'.format("["+key_fpr[-8:]+"]")
     return art
 
 def _get_coin(num_of_hits, ansi_art=False, coin=None):
