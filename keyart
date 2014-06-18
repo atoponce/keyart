@@ -43,7 +43,11 @@ def draw_art(key_size, key_algo, key_fpr):
     visits = [0]*209
     temp = ''
 
-    key_bin = bin(int(key_fpr, 16))[2:].zfill(len(key_fpr)*4)
+    try:
+        key_bin = bin(int(key_fpr, 16))[2:].zfill(len(key_fpr)*4)
+    except ValueError:
+        print "The supplied fingerprint is not a hexadecimal string."
+        sys.exit(3)
 
     for i, char in enumerate(key_bin):
         temp += char
