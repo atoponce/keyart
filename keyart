@@ -15,7 +15,7 @@ PARSER.add_argument('-c', '--color', help='Print the art with ANSI color.',
 PARSER.add_argument('-k', '--keyring', type=str, metavar=('KEYRING'),
                     action='append',
                     help='A publicly exported OpenPGP key or keyring.')
-PARSER.add_argument('-f', '--fingerprint', type=str, metavar=('FINGERPRINT'),
+PARSER.add_argument('-f', '--fingerprint', type=str, metavar=('HEX'),
                     action='append',
                     help='A hexadecimal string representing a fingerprint.')
 PARSER.add_argument('keyid', type=str, nargs='*', metavar=('KEYID'),
