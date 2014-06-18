@@ -32,7 +32,7 @@ def test_env():
         return gnupg
     except OSError:
         print "Please install GnuPG before using this script."
-        sys.exit(4)
+        sys.exit(1)
 
 def draw_art(key_size, key_algo, key_fpr):
     """Execute the Drunken Bishop algorithm on a key."""
@@ -243,6 +243,9 @@ if __name__ == '__main__':
         size = None
         algo = None
         fpr = ARGS.fingerprint[0]
+        if len(fpr) % 8 != 0:
+            print "Hex string must be a multiple of 8 bytes."
+            sys.exit(2)
         print draw_art(size, algo, fpr)
 
     if ARGS.keyring:
