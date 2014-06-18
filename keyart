@@ -5,7 +5,6 @@ as per the Drunken Bishop algorithm as applied to OpenSSH keys by Dirk Loss."""
 
 import argparse
 import os
-import re
 import subprocess
 import sys
 
@@ -13,31 +12,35 @@ PARSER = argparse.ArgumentParser(description='Create ASCII art of a PGP key.')
 GROUP = PARSER.add_mutually_exclusive_group(required=True)
 PARSER.add_argument('-a', '--ansi', help='Print the art with ANSI color.',
                     action='store_true')
-GROUP.add_argument('-i', '--id', type=str, nargs='+', metavar=('KEID'),
-                   help='A key identifier.')
-GROUP.add_argument('-k', '--keyring', type=str, nargs='+', metavar=('KEYRING'),
-                   help='A GPG keyring.')
+GROUP.add_argument('-i', '--id', type=str, nargs='+', metavar=('KEYID'),
+                   help='A key identifier (email, ID, fingerprint, etc.).')
+GROUP.add_argument('-f', '--file', type=str, nargs='+', metavar=('FILE'),
+                   help='A publicly exported GPG key or keyring.')
 ARGS = PARSER.parse_args()
 
-def fix_gpg(gpg_bin, keyid, keyring):
+def fix_gpg(gpg_bin, keyid, keyfile):
     """Temporary work around for GnuPG bug #1640.
     See https://bugs.g10code.com/gnupg/issue1640."""
-    cmd = (gpg_bin, '--yes', '--output', '0x%s.gpg' % keyid,
-           '--no-default-keyring', '--keyring=%s' % keyring, '--export', keyid)
-    gpg = subprocess.Popen(cmd)
-    gpg.communicate()
+    with open(os.devnull, 'wb') as devnull:
+        cmd = (gpg_bin, '--quiet', '--yes', '--output', '/tmp/.0x%s.gpg' % keyid,
+               '--no-default-keyring', '--keyring=%s' % keyfile, '--export',
+               keyid)
+        gpg = subprocess.Popen(cmd, stdout=devnull)
+        gpg.communicate()
 
-    cmd = (gpg_bin, '--quiet', '--import', '0x%s.gpg' % keyid)
-    gpg = subprocess.Popen(cmd)
-    gpg.communicate()
+        cmd = (gpg_bin, '--quiet', '--import', '/tmp/.0x%s.gpg' % keyid)
+        gpg = subprocess.Popen(cmd, stdout=devnull)
+        gpg.communicate()
 
-    cmd = (gpg_bin, '--fingerprint', '--with-colons', keyid)
-    gpg = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    cmd = ('grep', '^fpr')
-    grep = subprocess.Popen(cmd, stdin=gpg.stdout, stdout=subprocess.PIPE)
-    out = grep.communicate()[0]
+        os.remove('/tmp/.0x%s.gpg' % keyid)
 
-    fpr = out.split(':')[9]
+        cmd = (gpg_bin, '--fingerprint', '--with-colons', keyid)
+        gpg = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        cmd = ('grep', '^fpr')
+        grep = subprocess.Popen(cmd, stdin=gpg.stdout, stdout=subprocess.PIPE)
+        out = grep.communicate()[0]
+        fpr = out.split(':')[9]
+
     return fpr
 
 def test_env():
@@ -268,10 +271,9 @@ if __name__ == '__main__':
 
             print draw_art(size, algo, fpr)
 
-    if ARGS.keyring:
-        pattern = re.compile('^([A-Z0-9]{32}|[A-Z0-9]{40})$')
-        for keyring in ARGS.keyring:
-            cmd = (gpg_bin, '--with-fingerprint', '--with-colons', keyring)
+    if ARGS.file:
+        for key in ARGS.file:
+            cmd = (gpg_bin, '--with-fingerprint', '--with-colons', key)
             gpg = subprocess.Popen(cmd, stdout=subprocess.PIPE)
             cmd = ('grep', '-E', '^(pub|fpr)')
             grep = subprocess.Popen(cmd, stdin=gpg.stdout,
@@ -282,10 +284,10 @@ if __name__ == '__main__':
                 if out[i].split(':')[0] == 'pub':
                     size = out[i].split(':')[2]
                     algo = out[i].split(':')[3]
-                    fpr = out[i+1].split(':')[9]
-
-                    if not pattern.match(fpr):
+                    if out[i+1].split(':')[0] == 'fpr':
+                        fpr = out[i+1].split(':')[9]
+                    else:
                         keyid = out[i].split(':')[4]
-                        fpr = fix_gpg(gpg_bin, keyid, keyring)
+                        fpr = fix_gpg(gpg_bin, keyid, os.path.abspath(key))
 
                     print draw_art(size, algo, fpr)
