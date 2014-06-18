@@ -12,9 +12,12 @@ PARSER = argparse.ArgumentParser(
     description='Creates ASCII art from OpenPGP keys.')
 PARSER.add_argument('-c', '--color', help='Print the art with ANSI color.',
                     action='store_true')
-PARSER.add_argument('-f', '--file', type=str, metavar=('FILE'),
+PARSER.add_argument('-k', '--keyring', type=str, metavar=('KEYRING'),
                     action='append',
                     help='A publicly exported OpenPGP key or keyring.')
+PARSER.add_argument('-f', '--fingerprint', type=str, metavar=('FINGERPRINT'),
+                    action='append',
+                    help='A hexadecimal string representing a fingerprint.')
 PARSER.add_argument('keyid', type=str, nargs='*', metavar=('KEYID'),
                     help='A key identifier (email, ID, fingerprint, etc.).')
 ARGS = PARSER.parse_args()
@@ -153,7 +156,11 @@ def draw_art(key_size, key_algo, key_fpr):
     else:
         key_algo = 'N/A'
 
-    header = "["+key_algo+" "+key_size+"]"
+    if key_size:
+        header = "["+key_algo+" "+key_size+"]"
+    else:
+        header = ''
+
     if len(header) > 19:
         header = ''
     art += '+{:-^19}+\n'.format(header)
@@ -216,19 +223,7 @@ def _get_coin(num_of_hits, ansi_art=False, coin=None):
         coin = coins[num_of_hits]
     return '{}{}{}'.format(color, coin, reset)
 
-if __name__ == '__main__':
-    gpg_bin = test_env()
-
-    cmd = [gpg_bin, '--with-colons', '--fingerprint']
-    if ARGS.file:
-        cmd.append('--no-default-keyring')
-        cmd.extend(['--keyring=%s' % os.path.abspath(keyring) for keyring in
-                    ARGS.file])
-
-    if ARGS.keyid:
-        cmd.append('--')
-        cmd.extend(ARGS.keyid)
-
+def gpg_cmd(cmd):
     gpg = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     for lines in gpg.communicate()[0].split('\n'):
         colons = lines.split(':')
@@ -239,3 +234,24 @@ if __name__ == '__main__':
             print draw_art(size, algo, colons[9])
             size = None
             algo = None
+
+if __name__ == '__main__':
+    gpg_bin = test_env()
+
+    cmd = [gpg_bin, '--with-colons', '--fingerprint']
+    if ARGS.fingerprint:
+        size = None
+        algo = None
+        fpr = ARGS.fingerprint[0]
+        print draw_art(size, algo, fpr)
+
+    if ARGS.keyring:
+        cmd.append('--no-default-keyring')
+        cmd.extend(['--keyring=%s' % os.path.abspath(keyring)
+                    for keyring in ARGS.keyring])
+        gpg_cmd(cmd)
+
+    if ARGS.keyid:
+        cmd.append('--')
+        cmd.extend(ARGS.keyid)
+        gpg_cmd(cmd)
