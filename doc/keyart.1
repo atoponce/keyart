@@ -39,26 +39,24 @@ SHA3 hexadecimal checksum. Useful for comparing and analyzing potential
 collisions with existing keys. This option can be repeated multiple times.
 .TP 8
 .B \-k | \-\-keyring \fIKEYRING\fR
-An OpenPGP key file or keyring, from which the \fIKEYID\fRs are
-exported.  This option can be repeated multiple times to provide a list
-of key files or keyrings; if this option is not present, the
-\fIKEYID\fRs are used from GnuPG's default keyring.
+An OpenPGP public key file or keyring, from which the \fIKEYID\fRs are to
+be found.  If this option is not present, the \fIKEYID\fRs are found from
+GnuPG's default keyring (usually ~/.gnupg/pubring.gpg); if it is
+repeated multiple times, the provided \fIKEYRING\fRs are used as
+successive sources.
 .TP 8
 .B \-h | \-\-help
 Print the help message and quit.
-.SH EXIT Codes
+.SH EXIT STATUS
 .TP 8
 .B 0
-\fBkeyart\fR was executed sucessfully.
+\fBkeyart\fR was executed successfully.
 .TP 8
 .B 1
 \fBgpg\fR(1) or \fBgpg2\fR(1) are not installed.
 .TP 8
 .B 2
 The supplied hexadecimal string is not a multiple of 8 bytes.
-.TP 8
-.B 3
-The fingerprint is not a hexadecimal string.
 .SH SEE ALSO
 .BR gpg (1)
 .SH AUTHOR
