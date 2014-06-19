@@ -167,7 +167,7 @@ def draw_art(key_size, key_algo, key_fpr):
 
     if len(header) > 19:
         header = ''
-    art += '+{:-^19}+\n'.format(header)
+    art += '+' + str.center(header, 19, '-') + '+\n'
 
     for i, visit in enumerate(visits):
         # Build up the art with the boundaries and newlines
@@ -191,7 +191,7 @@ def draw_art(key_size, key_algo, key_fpr):
     else:
         footer = ''
 
-    art += '+{:-^19}+'.format(footer)
+    art += '+' + str.center(footer, 19, '-') + '+'
 
     return art
 
