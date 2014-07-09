@@ -252,7 +252,7 @@ def gpg_cmd(cmd):
 if __name__ == '__main__':
     gpg_bin = test_env()
 
-    cmd = [gpg_bin, '--with-colons', '--fingerprint', '--no-options']
+    cmd = [gpg_bin, '--no-options', '--with-colons', '--fingerprint']
     if ARGS.fingerprint:
         for fpr in ARGS.fingerprint:
             if len(fpr) % 8 != 0:
