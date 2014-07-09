@@ -31,7 +31,7 @@ def test_env():
             gnupg = '/usr/bin/gpg2'
         return gnupg
     except OSError:
-        print "Please install GnuPG before using this script."
+        print("Please install GnuPG before using this script.")
         sys.exit(1)
 
 def draw_art(key_size, key_algo, key_fpr):
@@ -46,7 +46,7 @@ def draw_art(key_size, key_algo, key_fpr):
     try:
         key_bin = bin(int(key_fpr, 16))[2:].zfill(len(key_fpr)*4)
     except ValueError:
-        print "The supplied fingerprint is not a hexadecimal string."
+        print("The supplied fingerprint is not a hexadecimal string.")
         sys.exit(3)
 
     for i, char in enumerate(key_bin):
@@ -56,7 +56,7 @@ def draw_art(key_size, key_algo, key_fpr):
             temp = ''
 
     # create a little-endian bit-pair array
-    for i in xrange(0, len(f_bytes), 4):
+    for i in range(0, len(f_bytes), 4):
         f_bytes[i], f_bytes[i+3] = f_bytes[i+3], f_bytes[i]
         f_bytes[i+1], f_bytes[i+2] = f_bytes[i+2], f_bytes[i+1]
 
@@ -167,7 +167,7 @@ def draw_art(key_size, key_algo, key_fpr):
 
     if len(header) > 19:
         header = ''
-    art += '+' + str.center(header, 19, '-') + '+\n'
+    art += '+{:-^19}+\n'.format(header)
 
     for i, visit in enumerate(visits):
         # Build up the art with the boundaries and newlines
@@ -191,7 +191,7 @@ def draw_art(key_size, key_algo, key_fpr):
     else:
         footer = ''
 
-    art += '+' + str.center(footer, 19, '-') + '+'
+    art += '+{:-^19}+'.format("["+key_fpr[-8:]+"]")
 
     return art
 
@@ -235,13 +235,13 @@ def _get_coin(num_of_hits, ansi_art=False, coin=None):
 
 def gpg_cmd(cmd):
     gpg = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    for lines in gpg.communicate()[0].split('\n'):
+    for lines in gpg.communicate()[0].decode('ascii').split('\n'):
         colons = lines.split(':')
         if colons[0] == 'pub':
             size = colons[2]
             algo = colons[3]
         elif colons[0] == 'fpr':
-            print draw_art(size, algo, colons[9])
+            print(draw_art(size, algo, colons[9]))
             size = None
             algo = None
 
@@ -252,9 +252,9 @@ if __name__ == '__main__':
     if ARGS.fingerprint:
         for fpr in ARGS.fingerprint:
             if len(fpr) % 8 != 0:
-                print "Hex string must be a multiple of 8 bytes."
+                print("Hex string must be a multiple of 8 bytes.")
                 sys.exit(2)
-            print draw_art(None, None, fpr)
+            print(draw_art(None, None, fpr))
 
     if ARGS.keyring:
         cmd.append('--no-default-keyring')
