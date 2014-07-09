@@ -187,7 +187,7 @@ def draw_art(key_size, key_algo, key_fpr):
             art = art.format(_get_coin(visit, ARGS.color))
 
     if key_size:
-        footer = "["+key_fpr[-16:]+"]"
+        footer = "["+key_fpr[-8:]+"]"
     else:
         footer = ''
 
