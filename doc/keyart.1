@@ -7,6 +7,7 @@
 .SH SYNOPSIS
 .B keyart
 [\-c|\-\-color]
+[\-l|\-\-longid]
 [\-f|\-\-fingerprint \fIHEX\fR [\-f|\-\-fingerprint \fIHEX\fR ...]]
 [\-k|\-\-keyring \fIKEYRING\fR [\-k|\-\-keyring \fIKEYRING\fR ...]]
 [\fIKEYID\fR ...]
@@ -32,6 +33,11 @@ creates an ASCII art representation for all keys found.
 .TP 8
 .B \-c | \-\-color
 Print the ASCII art using ANSI color to the terminal.
+.TP 8
+.B \-l | \-\-longid
+Print the 16-character long ID of a on OpenPGP key in the footer badge. Default
+is to print the 8-character short ID. Silently ignored if "\fB\-f |
+\-\-fingerprint \fIHEX\fR" is passed.
 .TP 8
 .B \-f | \-\-fingerprint \fIHEX\fR
 Any arbitrary hexadecimal string of any length. Could be an MD5, SHA1, SHA2, or

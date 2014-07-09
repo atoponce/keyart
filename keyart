@@ -12,12 +12,14 @@ PARSER = argparse.ArgumentParser(
     description='Creates ASCII art from OpenPGP keys.')
 PARSER.add_argument('-c', '--color', help='Print the art with ANSI color.',
                     action='store_true')
-PARSER.add_argument('-k', '--keyring', type=str, metavar=('KEYRING'),
-                    action='append',
-                    help='A publicly exported OpenPGP key or keyring.')
+PARSER.add_argument('-l', '--longid', action='store_true',
+                    help='Print the 16-character long ID of a key.')
 PARSER.add_argument('-f', '--fingerprint', type=str, metavar=('HEX'),
                     action='append',
                     help='A hexadecimal string representing a fingerprint.')
+PARSER.add_argument('-k', '--keyring', type=str, metavar=('KEYRING'),
+                    action='append',
+                    help='A publicly exported OpenPGP key or keyring.')
 PARSER.add_argument('keyid', type=str, nargs='*', metavar=('KEYID'),
                     help='A key identifier (email, ID, fingerprint, etc.).')
 ARGS = PARSER.parse_args()
@@ -186,7 +188,9 @@ def draw_art(key_size, key_algo, key_fpr):
         else:
             art = art.format(_get_coin(visit, ARGS.color))
 
-    if key_size:
+    if key_size and ARGS.longid:
+        footer = "["+key_fpr[-16:]+"]"
+    elif key_size:
         footer = "["+key_fpr[-8:]+"]"
     else:
         footer = ''
