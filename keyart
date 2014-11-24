@@ -255,6 +255,8 @@ if __name__ == '__main__':
     cmd = [gpg_bin, '--no-options', '--with-colons', '--fingerprint']
     if ARGS.fingerprint:
         for fpr in ARGS.fingerprint:
+            # remove any possible colons, as is common with fingerprints
+            fpr = fpr.translate(None, ':')
             if len(fpr) % 8 != 0:
                 print("Hex string must be a multiple of 8 bytes.")
                 sys.exit(2)
