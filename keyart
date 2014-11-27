@@ -5,6 +5,7 @@ as per the Drunken Bishop algorithm as applied to OpenSSH keys by Dirk Loss."""
 
 import argparse
 import os
+import re
 import subprocess
 import sys
 
@@ -251,12 +252,12 @@ def gpg_cmd(cmd):
 
 if __name__ == '__main__':
     gpg_bin = test_env()
+    strip_nonhex = re.compile('[^a-fA-F0-9]+')
 
     cmd = [gpg_bin, '--no-options', '--with-colons', '--fingerprint']
     if ARGS.fingerprint:
         for fpr in ARGS.fingerprint:
-            # remove any possible colons, as is common with fingerprints
-            fpr = fpr.translate(None, ':')
+            fpr = strip_nonhex.sub('',fpr)
             if len(fpr) % 8 != 0:
                 print("Hex string must be a multiple of 8 bytes.")
                 sys.exit(2)
